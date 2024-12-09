@@ -3,20 +3,21 @@
 
 It contains all Thunk Creators and Thunks.
 ================================================== */
+import axios from 'axios';
 import * as ac from './actions/actionCreators';  // Import Action Creators ("ac" keyword Action Creator)
-const axios = require('axios');
+//const axios = require('axios');
 
 //All Campuses
 // THUNK CREATOR:
-export const fetchAllCampusesThunk = () => async (dispatch) => {  // The THUNK
+export const fetchAllCampusesThunk = () => async (dispatch) => {
   try {
-    // API "get" call to get "campuses" data from database
-    let res = await axios.get(`/api/campuses`);  
-    // Call Action Creator to return Action object (type + payload with "campuses" data)
-    // Then dispatch the Action object to Reducer to update state 
+    console.log("Starting fetch...");
+    let res = await axios.get(`/api/campuses`);
+    console.log("API Response:", res);
+    console.log("Campuses data:", res.data);
     dispatch(ac.fetchAllCampuses(res.data));
   } catch(err) {
-    console.error(err);
+    console.error("Error fetching campuses:", err);
   }
 };
 
@@ -27,6 +28,31 @@ export const fetchCampusThunk = (id) => async (dispatch) => {  // The THUNK
     // API "get" call to get a student data (based on "id")from database
     let res = await axios.get(`/api/campuses/${id}`);  
     dispatch(ac.fetchCampus(res.data));
+  } catch(err) {
+    console.error(err);
+  }
+};
+
+export const addCampusThunk = (campus) => async (dispatch) => {
+  try {
+    let res = await axios.post(`/api/campuses`, campus);
+    dispatch({
+      type: "ADD_CAMPUS",
+      payload: res.data
+    });
+    return res.data;
+  } catch(err) {
+    console.error(err);
+  }
+};
+
+export const deleteCampusThunk = (id) => async (dispatch) => {
+  try {
+    await axios.delete(`/api/campuses/${id}`);
+    dispatch({
+      type: "DELETE_CAMPUS",
+      payload: id
+    });
   } catch(err) {
     console.error(err);
   }
