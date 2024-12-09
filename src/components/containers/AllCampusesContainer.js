@@ -9,23 +9,31 @@ import Header from './Header';
 import { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { fetchAllCampusesThunk } from "../../store/thunks";
+import { fetchAllCampusesThunk, deleteCampusThunk } from "../../store/thunks";
 import { AllCampusesView } from "../views";
 
 class AllCampusesContainer extends Component {
-  // Get all campuses data from back-end database
+  constructor(props) {
+    super(props);
+    this.handleDelete = this.handleDelete.bind(this);
+  }
   componentDidMount() {
-    console.log(this.props);
+    console.log("Component mounting, props:", this.props);
     this.props.fetchAllCampuses();
   }
+  handleDelete(campusId) {
+    console.log("Deleting campus:", campusId);
+    this.props.handleDelete(campusId);
+  }
 
-  // Render All Campuses view by passing all campuses data as props to the corresponding View component
   render() {
+    console.log("Rendering with campuses:", this.props.allCampuses);
     return (
       <div>
         <Header />
         <AllCampusesView
           allCampuses={this.props.allCampuses}
+          handleDelete={this.handleDelete}
         />
       </div>
     );
@@ -45,6 +53,7 @@ const mapState = (state) => {
 const mapDispatch = (dispatch) => {
   return {
     fetchAllCampuses: () => dispatch(fetchAllCampusesThunk()),
+    handleDelete: (campusId) => dispatch(deleteCampusThunk(campusId))
   };
 };
 
@@ -52,6 +61,7 @@ const mapDispatch = (dispatch) => {
 AllCampusesContainer.propTypes = {
   allCampuses: PropTypes.array.isRequired,
   fetchAllCampuses: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
 };
 
 // Export store-connected container by default
