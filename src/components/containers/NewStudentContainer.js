@@ -5,92 +5,158 @@ The Container component is responsible for stateful logic and data fetching, and
 passes data (if any) as props to the corresponding View component.
 If needed, it also defines the component's "connect" function.
 ================================================== */
-import Header from './Header';
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
-
+import Header from './Header';
 import NewStudentView from '../views/NewStudentView';
 import { addStudentThunk } from '../../store/thunks';
 
 class NewStudentContainer extends Component {
-  // Initialize state
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
-      firstname: "", 
-      lastname: "", 
-      campusId: null, 
-      redirect: false, 
+      firstname: "",
+      lastname: "",
+      email: "",
+      imageUrl: "",
+      gpa: "",
+      campusId: "",
+      errors: {
+        firstname: "",
+        lastname: "",
+        email: "",
+        gpa: "",
+        imageUrl: "",
+        campusId: "",
+        submit: ""
+      },
+      redirect: false,
       redirectId: null
     };
   }
 
-  // Capture input data when it is entered
+  validateField = (name, value) => {
+    let error = "";
+    switch (name) {
+      case "firstname":
+      case "lastname":
+        if (!value) error = "This field is required";
+        else if (value.length < 2) error = "Must be at least 2 characters";
+        break;
+      
+      case "email":
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!value) error = "Email is required";
+        else if (!emailRegex.test(value)) error = "Invalid email format";
+        break;
+      
+      case "gpa":
+        if (value) {
+          const gpaValue = parseFloat(value);
+          if (isNaN(gpaValue) || gpaValue < 0 || gpaValue > 4) {
+            error = "GPA must be between 0.0 and 4.0";
+          }
+        }
+        break;
+      
+      case "imageUrl":
+        if (value) {
+          const urlRegex = /^https?:\/\/.+\..+/;
+          if (!urlRegex.test(value)) {
+            error = "Invalid URL format (must start with http:// or https://)";
+          }
+        }
+        break;
+      
+      default:
+        break;
+    }
+    return error;
+  }
+
   handleChange = event => {
-    this.setState({
-      [event.target.name]: event.target.value
-    });
-  }
-
-  // Take action after user click the submit button
-  handleSubmit = async event => {
-    event.preventDefault();  // Prevent browser reload/refresh after submit.
-
-    let student = {
-        firstname: this.state.firstname,
-        lastname: this.state.lastname,
-        campusId: this.state.campusId
-    };
+    const { name, value } = event.target;
     
-    // Add new student in back-end database
-    let newStudent = await this.props.addStudent(student);
-
-    // Update state, and trigger redirect to show the new student
-    this.setState({
-      firstname: "", 
-      lastname: "", 
-      campusId: null, 
-      redirect: true, 
-      redirectId: newStudent.id
-    });
+    this.setState(prevState => ({
+      [name]: value,
+      errors: {
+        ...prevState.errors,
+        [name]: this.validateField(name, value),
+        submit: "" // Clear submit error when user makes changes
+      }
+    }));
   }
 
-  // Unmount when the component is being removed from the DOM:
-  componentWillUnmount() {
-      this.setState({redirect: false, redirectId: null});
-  }
+  handleSubmit = async event => {
+    event.preventDefault();
 
-  // Render new student input form
-  render() {
-    // Redirect to new student's page after submit
-    if(this.state.redirect) {
-      return (<Redirect to={`/student/${this.state.redirectId}`}/>)
+    // Validate all fields
+    const errors = {
+      firstname: this.validateField("firstname", this.state.firstname),
+      lastname: this.validateField("lastname", this.state.lastname),
+      email: this.validateField("email", this.state.email),
+      gpa: this.validateField("gpa", this.state.gpa),
+      imageUrl: this.validateField("imageUrl", this.state.imageUrl)
+    };
+
+    // Check if there are any errors
+    if (Object.values(errors).some(error => error)) {
+      this.setState({ errors });
+      return;
     }
 
-    // Display the input form via the corresponding View component
+    try {
+      const student = {
+        firstname: this.state.firstname,
+        lastname: this.state.lastname,
+        email: this.state.email,
+        imageUrl: this.state.imageUrl || null,
+        gpa: this.state.gpa ? parseFloat(this.state.gpa) : null,
+        campusId: this.state.campusId ? parseInt(this.state.campusId) : null
+      };
+
+      const newStudent = await this.props.addStudent(student);
+
+      if (newStudent && newStudent.id) {
+        this.setState({
+          redirect: true,
+          redirectId: newStudent.id
+        });
+      } else {
+        throw new Error("Failed to add student");
+      }
+    } catch (err) {
+      console.error(err);
+      this.setState(prevState => ({
+        errors: {
+          ...prevState.errors,
+          submit: "Failed to add student: " + (err.message || "Unknown error")
+        }
+      }));
+    }
+  }
+
+  render() {
+    if (this.state.redirect) {
+      return <Redirect to={`/student/${this.state.redirectId}`} />;
+    }
+
     return (
       <div>
         <Header />
         <NewStudentView 
-          handleChange = {this.handleChange} 
-          handleSubmit={this.handleSubmit}      
+          handleChange={this.handleChange}
+          handleSubmit={this.handleSubmit}
+          errors={this.state.errors}
         />
-      </div>          
+      </div>
     );
   }
 }
 
-// The following input argument is passed to the "connect" function used by "NewStudentContainer" component to connect to Redux Store.
-// The "mapDispatch" argument is used to dispatch Action (Redux Thunk) to Redux Store.
-// The "mapDispatch" calls the specific Thunk to dispatch its action. The "dispatch" is a function of Redux Store.
-const mapDispatch = (dispatch) => {
-    return({
-        addStudent: (student) => dispatch(addStudentThunk(student)),
-    })
-}
+const mapDispatch = (dispatch) => ({
+  addStudent: (student) => dispatch(addStudentThunk(student))
+});
 
-// Export store-connected container by default
-// NewStudentContainer uses "connect" function to connect to Redux Store and to read values from the Store 
-// (and re-read the values when the Store State updates).
 export default connect(null, mapDispatch)(NewStudentContainer);

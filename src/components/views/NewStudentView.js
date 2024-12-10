@@ -7,75 +7,89 @@ It constructs a React component to display the new student page.
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
+import './styles/NewStudent.css';
 
-// Create styling for the input form
-const useStyles = makeStyles( () => ({
-  formContainer:{  
-    width: '500px',
-    backgroundColor: '#f0f0f5',
-    borderRadius: '5px',
-    margin: 'auto',
-  },
-  title: {
-    flexGrow: 1,
-    textAlign: 'left',
-    textDecoration: 'none'
-  }, 
-  customizeAppBar:{
-    backgroundColor: '#11153e',
-    shadows: ['none'],
-  },
-  formTitle:{
-    backgroundColor:'#c5c8d6',
-    marginBottom: '15px',
-    textAlign: 'center',
-    borderRadius: '5px 5px 0px 0px',
-    padding: '3px'
-  },
-}));
-
-const NewStudentView = (props) => {
-  const {handleChange, handleSubmit } = props;
-  const classes = useStyles();
-
-  // Render a New Student view with an input form
+const NewStudentView = ({ handleSubmit, handleChange, errors = {} }) => {
   return (
-    <div>
-      <h1>New Student</h1>
+    <div className="form-container">
+      <h2 className="form-title">Add New Student</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>First Name<span className="required">*</span></label>
+          <input
+            type="text"
+            name="firstname"
+            onChange={handleChange}
+            className={errors.firstname ? "error" : ""}
+          />
+          {errors.firstname && <span className="error-message">{errors.firstname}</span>}
+        </div>
 
-      <div className={classes.root}>
-        <div className={classes.formContainer}>
-          <div className={classes.formTitle}>
-            <Typography style={{fontWeight: 'bold', fontFamily: 'Courier, sans-serif', fontSize: '20px', color: '#11153e'}}>
-              Add a Student
-            </Typography>
-          </div>
-          <form style={{textAlign: 'center'}} onSubmit={(e) => handleSubmit(e)}>
-            <label style= {{color:'#11153e', fontWeight: 'bold'}}>First Name: </label>
-            <input type="text" name="firstname" onChange ={(e) => handleChange(e)} />
-            <br/>
-            <br/>
+        <div className="form-group">
+          <label>Last Name<span className="required">*</span></label>
+          <input
+            type="text"
+            name="lastname"
+            onChange={handleChange}
+            className={errors.lastname ? "error" : ""}
+          />
+          {errors.lastname && <span className="error-message">{errors.lastname}</span>}
+        </div>
 
-            <label style={{color:'#11153e', fontWeight: 'bold'}}>Last Name: </label>
-            <input type="text" name="lastname" onChange={(e) => handleChange(e)} />
-            <br/>
-            <br/>
+        <div className="form-group">
+          <label>Email<span className="required">*</span></label>
+          <input
+            type="email"
+            name="email"
+            onChange={handleChange}
+            className={errors.email ? "error" : ""}
+          />
+          {errors.email && <span className="error-message">{errors.email}</span>}
+        </div>
 
-            <label style={{color:'#11153e', fontWeight: 'bold'}}>Campus Id: </label>
-            <input type="text" name="campusId" onChange={(e) => handleChange(e)} />
-            <br/>
-            <br/>
+        <div className="form-group">
+          <label>GPA</label>
+          <input
+            type="number"
+            name="gpa"
+            step="0.1"
+            min="0"
+            max="4"
+            onChange={handleChange}
+            className={errors.gpa ? "error" : ""}
+          />
+          {errors.gpa && <span className="error-message">{errors.gpa}</span>}
+        </div>
 
-            <Button variant="contained" color="primary" type="submit">
-              Submit
-            </Button>
-            <br/>
-            <br/>
-          </form>
-          </div>
-      </div>
-    </div>    
-  )
-}
+        <div className="form-group">
+          <label>Image URL</label>
+          <input
+            type="url"
+            name="imageUrl"
+            onChange={handleChange}
+            className={errors.imageUrl ? "error" : ""}
+            placeholder="https://example.com/image.jpg"
+          />
+          {errors.imageUrl && <span className="error-message">{errors.imageUrl}</span>}
+        </div>
+
+        <div className="form-group">
+          <label>Campus ID</label>
+          <input
+            type="number"
+            name="campusId"
+            onChange={handleChange}
+            className={errors.campusId ? "error" : ""}
+          />
+          {errors.campusId && <span className="error-message">{errors.campusId}</span>}
+        </div>
+
+        {errors.submit && <div className="error-message">{errors.submit}</div>}
+
+        <button type="submit">Add Student</button>
+      </form>
+    </div>
+  );
+};
 
 export default NewStudentView;
