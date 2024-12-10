@@ -15,13 +15,17 @@ import { addStudentThunk } from '../../store/thunks';
 class NewStudentContainer extends Component {
   constructor(props) {
     super(props);
+    // Get campusId from URL query parameters
+    const searchParams = new URLSearchParams(this.props.location.search);
+    const campusId = searchParams.get('campusId');
+    
     this.state = {
       firstname: "",
       lastname: "",
       email: "",
       imageUrl: "",
       gpa: "",
-      campusId: "",
+      campusId: campusId || "", // Initialize with campusId from URL if it exists
       errors: {
         firstname: "",
         lastname: "",
@@ -32,7 +36,8 @@ class NewStudentContainer extends Component {
         submit: ""
       },
       redirect: false,
-      redirectId: null
+      redirectId: null,
+      redirectToCampus: !!campusId // New flag to handle redirect back to campus
     };
   }
 
@@ -83,7 +88,7 @@ class NewStudentContainer extends Component {
       errors: {
         ...prevState.errors,
         [name]: this.validateField(name, value),
-        submit: "" // Clear submit error when user makes changes
+        submit: ""
       }
     }));
   }
@@ -138,7 +143,11 @@ class NewStudentContainer extends Component {
   }
 
   render() {
+    // Handle redirect based on whether we're adding to a campus or not
     if (this.state.redirect) {
+      if (this.state.redirectToCampus) {
+        return <Redirect to={`/campus/${this.state.campusId}`} />;
+      }
       return <Redirect to={`/student/${this.state.redirectId}`} />;
     }
 
@@ -149,6 +158,8 @@ class NewStudentContainer extends Component {
           handleChange={this.handleChange}
           handleSubmit={this.handleSubmit}
           errors={this.state.errors}
+          campusId={this.state.campusId} // Pass campusId to view
+          redirectToCampus={this.state.redirectToCampus} // Pass redirect flag to view
         />
       </div>
     );
