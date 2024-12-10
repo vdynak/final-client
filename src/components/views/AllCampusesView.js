@@ -6,41 +6,71 @@ It constructs a React component to display all campuses.
 ================================================== */
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
+import '../views/styles/AllCampusesView.css';
 
 const AllCampusesView = (props) => {
-  // If there is no campus, display a message.
+  console.log("AllCampusesView props:", props);
+  if (!props.allCampuses) {
+    console.log("No campuses data yet");
+    return <div>Loading...</div>;
+  }
+  // If there is no campus, display a message and Add Campus button
   if (!props.allCampuses.length) {
-    return <div>There are no campuses.</div>;
+    return (
+      <div className="no-campuses">
+        <h1>All Campuses</h1>
+        <p>There are no campuses in the database.</p>
+        <Link to={`/newcampus`}>
+          <button className="add-button">Add New Campus</button>
+        </Link>
+      </div>
+    );
   }
 
   // If there is at least one campus, render All Campuses view 
   return (
-    <div>
+    <div className="all-campuses">
       <h1>All Campuses</h1>
 
-      {props.allCampuses.map((campus) => (
-        <div key={campus.id}>
-          <Link to={`/campus/${campus.id}`}>
-            <h2>{campus.name}</h2>
-          </Link>
-          <h4>campus id: {campus.id}</h4>
-          <p>{campus.address}</p>
-          <p>{campus.description}</p>
-          <hr/>
-        </div>
-      ))}
-      <br/>
-      <Link to={`/`}>
-        <button>Add New Campus</button>
+      {/* Add New Campus button at the top */}
+      <Link to={`/newcampus`}>
+        <button className="add-button">Add New Campus</button>
       </Link>
-      <br/><br/>
+
+      <div className="campus-grid">
+        {props.allCampuses.map((campus) => (
+          <div key={campus.id} className="campus-card">
+            <Link to={`/campus/${campus.id}`}>
+              <h2>{campus.name}</h2>
+            </Link>
+            <p><strong>Campus ID:</strong> {campus.id}</p>
+            <p><strong>Address:</strong> {campus.address}</p>
+            {campus.description && (
+              <p><strong>Description:</strong> {campus.description}</p>
+            )}
+            
+            <div className="button-group">
+              <Link to={`/campus/${campus.id}`}>
+                <button className="view-button">View Details</button>
+              </Link>
+              <button 
+                className="delete-button"
+                onClick={() => props.handleDelete(campus.id)}
+              >
+                Delete Campus
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
 
-// Validate data type of the props passed to component.
+// Update PropTypes to include handleDelete
 AllCampusesView.propTypes = {
   allCampuses: PropTypes.array.isRequired,
+  handleDelete: PropTypes.func.isRequired,
 };
 
 export default AllCampusesView;
