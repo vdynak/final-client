@@ -73,17 +73,26 @@ export const fetchAllStudentsThunk = () => async (dispatch) => {  // The THUNK
 };
 
 // Add Student
-// THUNK CREATOR:
-export const addStudentThunk = (student) => async (dispatch) => {  // The THUNK
+export const addStudentThunk = (student) => async (dispatch) => {
   try {
-    // API "post" call to add "student" object's data to database
-    let res = await axios.post(`/api/students`, student);  
-    // Call Action Creator to return Action object (type + payload with new students data)
-    // Then dispatch the Action object to Reducer to update state 
+    // Log the request data
+    console.log("Sending student data:", student);
+    
+    // Make the API call
+    let res = await axios.post(`/api/students`, student);
+    
+    // Log the response
+    console.log("Server response:", res.data);
+
+    // Dispatch action with the new student data
     dispatch(ac.addStudent(res.data));
+    
+    // Return the new student data
     return res.data;
   } catch(err) {
-    console.error(err);
+    // Log the full error
+    console.error("Error in addStudentThunk:", err.response ? err.response.data : err);
+    return null;
   }
 };
 
