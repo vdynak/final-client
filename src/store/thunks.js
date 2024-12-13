@@ -35,14 +35,21 @@ export const fetchCampusThunk = (id) => async (dispatch) => {  // The THUNK
 
 export const addCampusThunk = (campus) => async (dispatch) => {
   try {
-    let res = await axios.post(`/api/campuses`, campus);
-    dispatch({
-      type: "ADD_CAMPUS",
-      payload: res.data
-    });
+    console.log("Sending campus data:", campus); // Debug log
+    
+    // Make sure we're using the full path
+    let res = await axios.post('/api/campuses', campus);
+    
+    console.log("Response from server:", res.data); // Debug log
+    
+    // Dispatch both actions
+    dispatch(ac.addCampus(res.data));
+    dispatch(fetchAllCampusesThunk()); // Fetch all campuses to update the list
+    
     return res.data;
   } catch(err) {
-    console.error(err);
+    console.error("Error in addCampusThunk:", err.response ? err.response.data : err);
+    throw err;
   }
 };
 
