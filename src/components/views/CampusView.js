@@ -2,112 +2,116 @@
 CampusView.js
 
 The Views component is responsible for rendering web page with data provided by the corresponding Container component.
-It constructs a React component to display a single campus and its students (if any).
+It constructs a React component to display a single campus and its students.
 ================================================== */
-import { Link, useHistory } from "react-router-dom";
-import './styles/CampusView.css';
+import React from "react";
+import { Link } from "react-router-dom";
+import "./styles/CampusView.css";
 
 const CampusView = (props) => {
-  const { campus, handleDelete } = props;
-  const history = useHistory();
+  const { campus, handleDelete, handleRemoveStudent } = props;
 
-  // Loading state
+  // Ensure campus exists before rendering
   if (!campus) {
-    return <div>Loading...</div>;
+    return (
+      <div className="campus-container">
+        <div className="campus-header">
+          <h1>Campus not found</h1>
+        </div>
+        <div className="campus-actions">
+          <Link to="/campuses" className="action-button back">
+            Back to Campuses
+          </Link>
+        </div>
+      </div>
+    );
   }
 
-  // Handler for delete button
-  const deleteCampus = async () => {
-    if (window.confirm('Are you sure you want to delete this campus?')) {
-      await handleDelete(campus.id);
-      history.push('/campuses');
-    }
-  };
-
-  // Handler for removing student from campus
-  const removeStudent = async (studentId) => {
-    if (window.confirm('Remove this student from the campus?')) {
-      await props.handleRemoveStudent(studentId);
-    }
-  };
-
-  // Helper function to format GPA
-  const formatGPA = (gpa) => {
-    if (gpa === null || gpa === undefined) return 'N/A';
-    const numGPA = parseFloat(gpa);
-    return !isNaN(numGPA) ? numGPA.toFixed(2) : 'N/A';
-  };
-  
+  // Render campus info
   return (
     <div className="campus-container">
       <div className="campus-header">
-        <h1>{campus.name || 'Unnamed Campus'}</h1>
-        <div className="campus-actions">
-          <Link to={`/campus/${campus.id}/edit`} className="edit-button">
-            Edit
+        <h1>{campus.name}</h1>
+        <div className="campus-header-actions">
+          <Link 
+            to={`/campus/${campus.id}/edit`}
+            className="action-button edit-button"
+          >
+            Edit Campus
           </Link>
-          <button 
-            className="delete-button"
-            onClick={deleteCampus}
+          <button
+            className="action-button delete-button"
+            onClick={() => handleDelete(campus.id)}
           >
             Delete Campus
           </button>
         </div>
       </div>
 
+      <div className="campus-image-container">
+        <img
+          src={campus.imageURL || 'https://via.placeholder.com/800x400?text=Campus+Image'}
+          alt={campus.name}
+          className="campus-image"
+          onError={(e) => {
+            e.target.src = 'https://via.placeholder.com/800x400?text=Campus+Image';
+          }}
+        />
+      </div>
+
       <div className="campus-info">
-        {campus.imageUrl && (
-          <img 
-            src={campus.imageUrl} 
-            alt={campus.name}
-            className="campus-image"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = 'default-campus.jpg'; // Add a default image
-            }}
-          />
+        <p className="campus-address">
+          <span>📍</span> {campus.address}
+        </p>
+        {campus.description && (
+          <p>{campus.description}</p>
         )}
-        <p><strong>Address:</strong> {campus.address || 'No address provided'}</p>
-        <p><strong>Description:</strong> {campus.description || 'No description available'}</p>
       </div>
 
       <div className="students-section">
         <div className="students-header">
-          <h2>Enrolled Students ({campus.students ? campus.students.length : 0})</h2>
-          <Link to={`/campus/${campus.id}/add-students`} className="add-button">
-            Add Students
-          </Link>
+          <div className="header-title">
+            <h2>Enrolled Students</h2>
+            <Link 
+              to={`/newstudent?campusId=${campus.id}`} 
+              className="action-button add-button"
+            >
+              + Add Student
+            </Link>
+          </div>
         </div>
 
         {campus.students && campus.students.length > 0 ? (
           <div className="students-list">
-            {campus.students.map(student => {
-              const name = `${student.firstname || ''} ${student.lastname || ''}`.trim() || 'Unnamed Student';
-              return (
-                <div key={student.id} className="student-card">
-                  <div className="student-info">
-                    <Link to={`/student/${student.id}`}>
-                      <h3>{name}</h3>
-                    </Link>
-                    <p><strong>Email:</strong> {student.email || 'No email provided'}</p>
-                    <p><strong>GPA:</strong> {formatGPA(student.gpa)}</p>
-                  </div>
-                  <button 
-                    className="remove-button"
-                    onClick={() => removeStudent(student.id)}
-                  >
-                    Remove Student
-                  </button>
+            {campus.students.map(student => (
+              <div key={student.id} className="student-card">
+                <Link to={`/student/${student.id}`}>
+                  <h3>{student.firstname} {student.lastname}</h3>
+                </Link>
+                <div className="student-details">
+                  <span>📧</span> {student.email}
+                  {student.gpa && (
+                    <span className="gpa">
+                      <span>📚</span> GPA: {student.gpa}
+                    </span>
+                  )}
                 </div>
-              );
-            })}
+                <button
+                  className="remove-button"
+                  onClick={() => {
+                    if (window.confirm('Remove this student from the campus?')) {
+                      handleRemoveStudent(student.id);
+                    }
+                  }}
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="no-students">
-            <p>No students currently enrolled</p>
-            <Link to={`/campus/${campus.id}/add-students`} className="add-button">
-              Add Students
-            </Link>
+            <p>No students currently enrolled at this campus</p>
           </div>
         )}
       </div>

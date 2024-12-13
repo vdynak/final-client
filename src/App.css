@@ -1,5 +1,10 @@
+:root {
+  --background-start: #f5f7fa;
+  --background-end: #c3cfe2;
+}
+
 .App {
-  background-color: beige;
+  background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
   min-height: 100vh;
   text-align: center;
 }
@@ -7,4 +12,3 @@
 .App-link {
   color: #61dafb;
 }
-

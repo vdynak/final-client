@@ -1,0 +1,159 @@
+/* Student view styles */
+.student-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.student-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.student-header h1 {
+  font-size: 2.5rem;
+  color: #2c3e50;
+  margin: 0;
+  margin-bottom: 0.5rem;
+}
+
+.student-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
+}
+
+.student-image-container {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin: 0 auto 2rem;
+}
+
+.student-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.student-info {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  width: 100%;
+}
+
+.student-info p {
+  margin: 1rem 0;
+  font-size: 1.2rem;
+  color: #2c3e50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.student-info p span {
+  color: #7f8c8d;
+  font-size: 1.1rem;
+}
+
+.campus-section {
+  text-align: center;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: rgba(74, 144, 226, 0.05);
+  border-radius: 12px;
+  width: 100%;
+}
+
+.campus-section h3 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.campus-link {
+  color: #4a90e2;
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.campus-link:hover {
+  color: #357abd;
+  transform: translateY(-2px);
+}
+
+.not-enrolled {
+  color: #95a5a6;
+  font-style: italic;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+}
+
+.student-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.action-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  text-align: center;
+  min-width: 120px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-button.edit {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.action-button.delete {
+  background-color: #ef5350;
+  color: white;
+}
+
+.action-button.back {
+  background-color: #7f8c8d;
+  color: white;
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+}
+
+.action-button.edit:hover {
+  background-color: #357abd;
+}
+
+.action-button.delete:hover {
+  background-color: #d32f2f;
+}
+
+.action-button.back:hover {
+  background-color: #6c7a89;
+}
